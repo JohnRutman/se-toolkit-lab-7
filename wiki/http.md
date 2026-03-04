@@ -12,6 +12,9 @@
 - [`HTTP` response](#http-response)
 - [`HTTP` response status code](#http-response-status-code)
 - [Common `HTTP` response status codes](#common-http-response-status-codes)
+- [Send a `GET` request](#send-a-get-request)
+  - [Send a `GET` request using a browser](#send-a-get-request-using-a-browser)
+  - [Send a `GET` request using `curl`](#send-a-get-request-using-curl)
   - [`200` (OK)](#200-ok)
   - [`201` (Created)](#201-created)
   - [`400` (Bad Request)](#400-bad-request)
@@ -23,7 +26,7 @@
 
 ## What is `HTTP`
 
-`HTTP` (`HyperText Transfer Protocol`) is the foundation of data communication on the web. This [protocol](./web-development.md#protocol) defines how messages are formatted and transmitted between [web servers and web clients](./web-development.md#web-server-and-web-client).
+`HTTP` (`HyperText Transfer Protocol`) is the foundation of data communication on the web. This [protocol](./computer-networks.md#protocol) defines how messages are formatted and transmitted between [web servers and web clients](./web-development.md#web-server-and-web-client).
 
 ## Communication using `HTTP`
 
@@ -71,7 +74,7 @@ Common methods:
 
 ### Query parameter
 
-Query parameters are key-value pairs appended to a [URL](./web-development.md#url) after a `?` character, used to send data to the server with a request.
+Query parameters are key-value pairs appended to a [URL](./computer-networks.md#url) after a `?` character, used to send data to the server with a request.
 
 ## `HTTP` response
 
@@ -114,3 +117,19 @@ Status codes are three-digit numbers returned by servers indicating the result o
 ### `500` (Internal Server Error)
 
 [`500` (Internal Server Error)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/500) — an unexpected server error occurred.
+
+## Send a `GET` request
+
+<!-- no toc -->
+- Method 1: [Send a `GET` request using a browser](#send-a-get-request-using-a-browser)
+- Method 2: [Send a `GET` request using `curl`](#send-a-get-request-using-curl)
+
+### Send a `GET` request using a browser
+
+1. Open the [URL](./computer-networks.md#url) in a browser.
+
+   The browser sends the `GET` request by default.
+
+### Send a `GET` request using `curl`
+
+See [`curl`](./useful-programs.md#send-a-get-request-with-curl).

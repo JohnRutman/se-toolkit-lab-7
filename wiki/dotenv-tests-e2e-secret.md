@@ -14,7 +14,7 @@ Default values: [`.env.tests.e2e.example`](../.env.tests.e2e.example)
 
 ## `API_BASE_URL`
 
-The base [URL](./web-development.md#url) of the deployed API.
+The base [URL](./computer-networks.md#url) of the deployed API.
 
 Example: `http://10.93.24.1:42002`
 

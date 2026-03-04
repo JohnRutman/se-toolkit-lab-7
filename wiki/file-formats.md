@@ -31,6 +31,7 @@
     - [`Python` example](#python-example)
     - [`Python` in this project](#python-in-this-project)
   - [`CSV`](#csv)
+  - [`Protobuf`](#protobuf)
 
 ## What is a file format?
 
@@ -186,3 +187,13 @@ def greet(name: str) -> str:
 Used for the application code and tests.
 
 ### `CSV`
+
+### `Protobuf`
+
+`Protobuf` (`Protocol Buffers`) is a binary serialization format developed by `Google` for structured data exchange between applications. It is language-neutral and more compact and faster than `JSON` or `XML`.
+
+`Protobuf` uses `.proto` files to define data structures, which are compiled into language-specific classes for various programming languages. It is commonly used in microservices and API communications where efficiency and schema evolution are important.
+
+#### `Protobuf` docs
+
+- [Protocol Buffers documentation](https://protobuf.dev/)

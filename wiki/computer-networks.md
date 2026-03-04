@@ -5,6 +5,7 @@
 - [What is a network](#what-is-a-network)
 - [Machine](#machine)
 - [Internet](#internet)
+- [Protocol](#protocol)
 - [IP address](#ip-address)
   - [IPv4](#ipv4)
   - [IPv6](#ipv6)
@@ -23,6 +24,9 @@
   - [`Wi-Fi` network](#wi-fi-network)
 - [Reverse proxy](#reverse-proxy)
   - [Forward request](#forward-request)
+- [URL](#url)
+  - [Components of a URL](#components-of-a-url)
+  - [URL example](#url-example)
 
 ## What is a network
 
@@ -39,6 +43,12 @@ Examples: a personal laptop, a university server, a [virtual machine](./vm.md#wh
 The Internet is a global [network](#what-is-a-network) that connects millions of smaller networks worldwide.
 
 It uses standardized communication protocols (such as `TCP/IP`) to link billions of devices, enabling communication and access to information across the globe.
+
+## Protocol
+
+A protocol is a set of rules that define how data is transmitted and received over a [network](#what-is-a-network). Protocols govern communication between [machines](#machine).
+
+Example: [`HTTP`](./http.md#what-is-http) is the protocol used for communication between [web servers](./web-development.md#web-server) and [web clients](./web-development.md#web-client).
 
 ## IP address
 
@@ -153,6 +163,38 @@ A `Wi-Fi` network is a [network](#what-is-a-network) that [machines](#machine) c
 Each `Wi-Fi` network has a name (called SSID) that identifies it to nearby devices.
 
 Example: `UniversityStudent`, `Home_Network`.
+
+## URL
+
+A URL (`Uniform Resource Locator`) is a reference or address used to identify and locate resources on the [Internet](#internet). It specifies the location of a resource on a [web server](./web-development.md#web-server) and the [protocol](#protocol) used to access it.
+
+URLs are used by browsers and other applications to retrieve resources like web pages, images, and API endpoints.
+
+### Components of a URL
+
+A typical URL consists of several components:
+
+- **Scheme/Protocol**: Specifies how to access the resource (e.g., `http`, `https`, `ftp`).
+- **[Host](#host)/Domain**: The server where the resource is located (e.g., `www.example.com`).
+- **[Port](#port)** (optional): The specific port number on the server (e.g., `:8080`).
+- **Path**: The location of the specific resource on the server (e.g., `/folder/page.html`).
+- **Query parameters** (optional): Additional data passed to the server (e.g., `?param1=value1&param2=value2`).
+- **Fragment** (optional): Points to a specific section within the resource (e.g., `#section1`).
+
+### URL example
+
+```text
+https://www.example.com:8080/search?q=cats&page=1#results
+```
+
+Where:
+
+- Scheme: `https`
+- Host: `www.example.com`
+- Port: `8080`
+- Path: `/search`
+- Query: `?q=cats&page=1`
+- Fragment: `#results`
 
 ## Reverse proxy
 
