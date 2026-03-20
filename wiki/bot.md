@@ -119,4 +119,4 @@ The [username](#bot-username) of your bot.
 
 3. Send `/start`.
 
-   You should see a response from the your bot.
+   You should see a response from your bot.
