@@ -5,8 +5,9 @@ WORKDIR /app
 # Install uv
 RUN pip install --no-cache-dir uv==0.7.13
 
-# Copy bot dependencies
-COPY pyproject.toml uv.lock ./
+# Copy bot dependencies (from parent directory)
+COPY pyproject.toml ./
+COPY uv.lock ./
 
 # Install dependencies
 RUN uv sync --frozen
