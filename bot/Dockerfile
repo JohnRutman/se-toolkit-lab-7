@@ -5,18 +5,18 @@ WORKDIR /app
 # Install uv
 RUN pip install --no-cache-dir uv==0.7.13
 
-# Copy bot dependencies (from parent directory)
-COPY pyproject.toml ./
+# Copy bot dependencies
+COPY bot/pyproject.toml ./pyproject.toml
 COPY uv.lock ./
 
 # Install dependencies
 RUN uv sync --frozen
 
 # Copy bot code
-COPY bot.py ./
-COPY config.py ./
-COPY handlers/ ./handlers/
-COPY services/ ./services/
+COPY bot/bot.py ./
+COPY bot/config.py ./
+COPY bot/handlers/ ./handlers/
+COPY bot/services/ ./services/
 
 # Run the bot
 CMD ["uv", "run", "python", "bot.py"]
