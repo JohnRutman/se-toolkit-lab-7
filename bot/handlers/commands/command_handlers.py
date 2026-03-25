@@ -37,7 +37,8 @@ def handle_health(command: str, args: str = "") -> str:
     client = _get_lms_client()
     try:
         result = client.health_check()
-        return f"🟢 Backend is healthy. {result['item_count']} items available."
+        count = result['item_count']
+        return f"✅ Backend health: OK. {count} items in database."
     except ConnectionError as e:
         return f"🔴 Backend error: {e}"
     except httpx.HTTPStatusError as e:
