@@ -1,5 +1,14 @@
 """Command handlers for slash commands."""
 
+import httpx
+from config import config
+from services.lms_client import LMSClient
+
+
+def _get_lms_client() -> LMSClient:
+    """Create an LMS client from config."""
+    return LMSClient(config.lms_api_base_url, config.lms_api_key)
+
 
 def handle_start(command: str, args: str = "") -> str:
     """Handle /start command — welcome message."""
@@ -24,26 +33,67 @@ def handle_help(command: str, args: str = "") -> str:
 
 
 def handle_health(command: str, args: str = "") -> str:
-    """Handle /health command — backend status (placeholder)."""
-    # Task 2: Replace with real API call
-    return "🟢 Backend is online (placeholder — will fetch real status in Task 2)"
+    """Handle /health command — backend status."""
+    client = _get_lms_client()
+    try:
+        result = client.health_check()
+        return f"🟢 Backend is healthy. {result['item_count']} items available."
+    except ConnectionError as e:
+        return f"🔴 Backend error: {e}"
+    except httpx.HTTPStatusError as e:
+        return f"🔴 Backend error: {e}"
 
 
 def handle_labs(command: str, args: str = "") -> str:
-    """Handle /labs command — list available labs (placeholder)."""
-    # Task 2: Replace with real API call
-    return (
-        "📋 Available Labs:\n\n"
-        "Lab 1 — Introduction\n"
-        "Lab 2 — Basic Concepts\n"
-        "Lab 3 — Advanced Topics\n\n"
-        "(placeholder — will fetch real data in Task 2)"
-    )
+    """Handle /labs command — list available labs."""
+    client = _get_lms_client()
+    try:
+        items = client.get_items()
+        if not items:
+            return "📋 No labs available."
+        
+        # Group items by lab_id
+        labs = {}
+        for item in items:
+            lab_id = item.get("lab_id", "Unknown")
+            lab_name = item.get("lab_name", "Unknown Lab")
+            if lab_id not in labs:
+                labs[lab_id] = lab_name
+        
+        if not labs:
+            return "📋 No labs found."
+        
+        lines = ["📋 Available Labs:\n"]
+        for lab_id, lab_name in sorted(labs.items()):
+            lines.append(f"- {lab_name}")
+        
+        return "\n".join(lines)
+    except ConnectionError as e:
+        return f"🔴 Backend error: {e}"
+    except httpx.HTTPStatusError as e:
+        return f"🔴 Backend error: {e}"
 
 
 def handle_scores(command: str, args: str = "") -> str:
-    """Handle /scores command — view scores for a lab (placeholder)."""
-    # Task 2: Replace with real API call
-    if args:
-        return f"📊 Scores for {args}:\n\nTask 1: 80%\nTask 2: 75%\n\n(placeholder — will fetch real data in Task 2)"
-    return "Please specify a lab, e.g., /scores lab-01"
+    """Handle /scores command — view scores for a lab."""
+    if not args:
+        return "Please specify a lab, e.g., /scores lab-01"
+    
+    client = _get_lms_client()
+    try:
+        pass_rates = client.get_pass_rates(args)
+        if not pass_rates:
+            return f"📊 No pass rate data found for {args}."
+        
+        lines = [f"📊 Pass rates for {args}:"]
+        for rate in pass_rates:
+            task_name = rate.get("task_name", "Unknown Task")
+            pass_rate = rate.get("pass_rate", 0)
+            attempts = rate.get("attempts", 0)
+            lines.append(f"- {task_name}: {pass_rate:.1f}% ({attempts} attempts)")
+        
+        return "\n".join(lines)
+    except ConnectionError as e:
+        return f"🔴 Backend error: {e}"
+    except httpx.HTTPStatusError as e:
+        return f"🔴 Backend error: {e}"
