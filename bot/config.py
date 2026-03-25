@@ -1,13 +1,17 @@
 """Configuration loading from environment variables."""
 
+from pathlib import Path
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+# Get the directory containing this config file
+BOT_DIR = Path(__file__).resolve().parent
 
 
 class BotConfig(BaseSettings):
     """Bot configuration loaded from environment variables."""
 
     model_config = SettingsConfigDict(
-        env_file=".env.bot.secret",
+        env_file=BOT_DIR / ".env.bot.secret",
         env_file_encoding="utf-8",
         extra="ignore",
     )
