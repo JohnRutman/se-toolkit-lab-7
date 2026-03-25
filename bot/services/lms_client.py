@@ -87,9 +87,70 @@ class LMSClient:
     
     def health_check(self) -> dict[str, Any]:
         """Check if the backend is healthy.
-        
+
         Returns:
             Health status with item count
         """
         items = self.get_items()
         return {"healthy": True, "item_count": len(items)}
+
+    def get_learners(self) -> list[dict[str, Any]]:
+        """Fetch all enrolled learners and their groups.
+
+        Returns:
+            List of learners with their metadata
+        """
+        return self._request("GET", "/learners/")
+
+    def get_timeline(self, lab: str) -> list[dict[str, Any]]:
+        """Fetch submission timeline for a specific lab.
+
+        Args:
+            lab: Lab identifier
+
+        Returns:
+            List of timeline data (submissions per day)
+        """
+        return self._request("GET", "/analytics/timeline", params={"lab": lab})
+
+    def get_groups(self, lab: str) -> list[dict[str, Any]]:
+        """Fetch per-group scores and student counts for a lab.
+
+        Args:
+            lab: Lab identifier
+
+        Returns:
+            List of group data
+        """
+        return self._request("GET", "/analytics/groups", params={"lab": lab})
+
+    def get_top_learners(self, lab: str, limit: int = 5) -> list[dict[str, Any]]:
+        """Fetch top N learners by score for a lab.
+
+        Args:
+            lab: Lab identifier
+            limit: Number of top learners to return
+
+        Returns:
+            List of top learners with their scores
+        """
+        return self._request("GET", "/analytics/top-learners", params={"lab": lab, "limit": limit})
+
+    def get_completion_rate(self, lab: str) -> dict[str, Any]:
+        """Fetch completion rate percentage for a lab.
+
+        Args:
+            lab: Lab identifier
+
+        Returns:
+            Completion rate data
+        """
+        return self._request("GET", "/analytics/completion-rate", params={"lab": lab})
+
+    def trigger_sync(self) -> dict[str, Any]:
+        """Trigger a data sync from the autochecker.
+
+        Returns:
+            Sync status
+        """
+        return self._request("POST", "/pipeline/sync")
