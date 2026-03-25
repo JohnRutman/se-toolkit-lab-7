@@ -31,20 +31,11 @@ def parse_command(text: str) -> tuple[str, str]:
     Example: "/scores lab-01" -> ("/scores", "lab-01")
     """
     parts = text.strip().split(maxsplit=1)
-    command = parts[0] if parts else ""
-    args = parts[1] if len(parts) > 1 else ""
-    return command, args
+    return parts[0] if parts else "", parts[1] if len(parts) > 1 else ""
 
 
 def get_handler(command: str) -> Callable[[str, str], str]:
-    """Get the handler function for a command."""
-    handlers = {
-        "/start": handle_start,
-        "/help": handle_help,
-        "/health": handle_health,
-        "/labs": handle_labs,
-        "/scores": handle_scores,
-    }
+    handlers = {"/start": handle_start, "/help": handle_help, "/health": handle_health, "/labs": handle_labs, "/scores": handle_scores}
     return handlers.get(command)
 
 
@@ -76,7 +67,6 @@ async def run_test_mode(message_text: str) -> None:
 
 
 async def handle_telegram_start(message: types.Message, bot: Bot) -> None:
-    """Telegram handler for /start."""
     response = await handle_start("/start", "")
 
     # Add inline keyboard buttons for common actions
@@ -101,28 +91,33 @@ async def handle_telegram_start(message: types.Message, bot: Bot) -> None:
 
 
 async def handle_telegram_help(message: types.Message, bot: Bot) -> None:
-    """Telegram handler for /help."""
-    response = await handle_help("/help", "")
-    await message.answer(response)
+    await message.answer(await handle_help("/help", ""))
 
 
 async def handle_telegram_health(message: types.Message, bot: Bot) -> None:
-    """Telegram handler for /health."""
-    response = await handle_health("/health", "")
-    await message.answer(response)
+    await message.answer(await handle_health("/health", ""))
 
 
 async def handle_telegram_labs(message: types.Message, bot: Bot) -> None:
-    """Telegram handler for /labs."""
-    response = await handle_labs("/labs", "")
-    await message.answer(response)
+    await message.answer(await handle_labs("/labs", ""))
 
 
 async def handle_telegram_scores(message: types.Message, bot: Bot) -> None:
-    """Telegram handler for /scores."""
     args = message.text.split(maxsplit=1)[1] if len(message.text.split()) > 1 else ""
-    response = await handle_scores("/scores", args)
-    await message.answer(response)
+    await message.answer(await handle_scores("/scores", args))
+
+
+async def handle_telegram_callback(message: types.CallbackQuery, bot: Bot) -> None:
+    action = message.data
+    responses = {
+        "health": await handle_health("/health", ""),
+        "labs": await handle_labs("/labs", ""),
+        "help": await handle_help("/help", ""),
+        "scores": "Use /scores <lab> e.g. /scores lab-01",
+        "top_learners": "Ask: 'who are top 5 students in lab-01?'",
+        "pass_rates": "Ask: 'what are pass rates for lab-01?'",
+    }
+    await message.answer(responses.get(action, "Unknown action."))
 
 
 async def handle_telegram_callback(message: types.CallbackQuery, bot: Bot) -> None:
@@ -159,10 +154,8 @@ async def handle_telegram_message(message: types.Message, bot: Bot) -> None:
 
 
 async def run_telegram_bot() -> None:
-    """Start the Telegram bot."""
     if not config.bot_token:
-        print("Error: BOT_TOKEN not set in .env.bot.secret")
-        print("Copy .env.bot.example to .env.bot.secret and fill in your bot token")
+        print("Error: BOT_TOKEN not set")
         sys.exit(1)
 
     bot = Bot(token=config.bot_token)
@@ -182,7 +175,6 @@ async def run_telegram_bot() -> None:
 
 
 def main() -> None:
-    """Main entry point."""
     parser = argparse.ArgumentParser(description="LMS Telegram Bot")
     parser.add_argument(
         "--test",
@@ -191,7 +183,6 @@ def main() -> None:
     )
 
     args = parser.parse_args()
-
     if args.test:
         import asyncio
         asyncio.run(run_test_mode(args.test))
