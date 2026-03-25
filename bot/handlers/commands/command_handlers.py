@@ -52,17 +52,19 @@ def handle_labs(command: str, args: str = "") -> str:
         if not items:
             return "📋 No labs available."
         
-        # Filter only labs (not tasks) and extract titles
-        labs = []
+        # Group items by lab_id
+        labs = {}
         for item in items:
-            if item.get("type") == "lab":
-                labs.append(item.get("title", "Unknown Lab"))
+            lab_id = item.get("lab_id", "Unknown")
+            lab_name = item.get("lab_name", "Unknown Lab")
+            if lab_id not in labs:
+                labs[lab_id] = lab_name
         
         if not labs:
             return "📋 No labs found."
         
         lines = ["📋 Available Labs:\n"]
-        for lab_name in labs:
+        for lab_id, lab_name in sorted(labs.items()):
             lines.append(f"- {lab_name}")
         
         return "\n".join(lines)
@@ -85,8 +87,8 @@ def handle_scores(command: str, args: str = "") -> str:
         
         lines = [f"📊 Pass rates for {args}:"]
         for rate in pass_rates:
-            task_name = rate.get("task", "Unknown Task")
-            pass_rate = rate.get("avg_score", 0)
+            task_name = rate.get("task_name", "Unknown Task")
+            pass_rate = rate.get("pass_rate", 0)
             attempts = rate.get("attempts", 0)
             lines.append(f"- {task_name}: {pass_rate:.1f}% ({attempts} attempts)")
         
