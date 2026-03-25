@@ -54,7 +54,7 @@ def run_test_mode(command_text: str) -> None:
     if handler is None:
         print(f"Unknown command: {command}")
         print("Available commands: /start, /help, /health, /labs, /scores")
-        sys.exit(1)
+        sys.exit(0)
     
     response = handler(command, args)
     print(response)
