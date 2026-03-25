@@ -1,16 +1,14 @@
-"""Command handlers for slash commands."""
+"""Command handlers for slash commands.
 
-import httpx
-from config import config
-from services.lms_client import LMSClient
+These handlers use the async API service (services/api.py) to communicate
+with the LMS backend. They are plain async functions — same logic works
+from --test mode, unit tests, or the Telegram bot.
+"""
 
-
-def _get_lms_client() -> LMSClient:
-    """Create an LMS client from config."""
-    return LMSClient(config.lms_api_base_url, config.lms_api_key)
+from services.api import APIError, check_health, fetch_items, fetch_pass_rates
 
 
-def handle_start(command: str, args: str = "") -> str:
+async def handle_start(command: str, args: str = "") -> str:
     """Handle /start command — welcome message."""
     return (
         "👋 Welcome to the LMS Bot!\n\n"
@@ -19,7 +17,7 @@ def handle_start(command: str, args: str = "") -> str:
     )
 
 
-def handle_help(command: str, args: str = "") -> str:
+async def handle_help(command: str, args: str = "") -> str:
     """Handle /help command — list available commands."""
     return (
         "📚 Available Commands:\n\n"
@@ -32,67 +30,42 @@ def handle_help(command: str, args: str = "") -> str:
     )
 
 
-def handle_health(command: str, args: str = "") -> str:
+async def handle_health(command: str, args: str = "") -> str:
     """Handle /health command — backend status."""
-    client = _get_lms_client()
-    try:
-        result = client.health_check()
-        count = result['item_count']
-        return f"✅ Backend health: OK. {count} items in database."
-    except ConnectionError as e:
-        return f"🔴 Backend error: {e}"
-    except httpx.HTTPStatusError as e:
-        return f"🔴 Backend error: {e}"
+    is_healthy, message, _ = await check_health()
+    return message
 
 
-def handle_labs(command: str, args: str = "") -> str:
+async def handle_labs(command: str, args: str = "") -> str:
     """Handle /labs command — list available labs."""
-    client = _get_lms_client()
     try:
-        items = client.get_items()
-        if not items:
-            return "📋 No labs available."
-        
-        # Filter only labs (not tasks) and extract titles
-        labs = []
-        for item in items:
-            if item.get("type") == "lab":
-                labs.append(item.get("title", "Unknown Lab"))
-        
+        items = await fetch_items()
+        labs = [item for item in items if item.type == "lab"]
         if not labs:
-            return "📋 No labs found."
-        
-        lines = ["📋 Available Labs:\n"]
-        for lab_name in labs:
-            lines.append(f"- {lab_name}")
-        
+            return "No labs available."
+        lines = ["Available labs:"]
+        for lab in labs:
+            lines.append(f"- {lab.title}")
         return "\n".join(lines)
-    except ConnectionError as e:
-        return f"🔴 Backend error: {e}"
-    except httpx.HTTPStatusError as e:
-        return f"🔴 Backend error: {e}"
+    except APIError as e:
+        return f"Failed to fetch labs: {e.message}"
 
 
-def handle_scores(command: str, args: str = "") -> str:
+async def handle_scores(command: str, args: str = "") -> str:
     """Handle /scores command — view scores for a lab."""
-    if not args:
+    lab_name = args.strip()
+    if not lab_name:
         return "Please specify a lab, e.g., /scores lab-01"
-    
-    client = _get_lms_client()
     try:
-        pass_rates = client.get_pass_rates(args)
+        pass_rates = await fetch_pass_rates(lab_name)
         if not pass_rates:
-            return f"📊 No pass rate data found for {args}."
-        
-        lines = [f"📊 Pass rates for {args}:"]
-        for rate in pass_rates:
-            task_name = rate.get("task", "Unknown Task")
-            pass_rate = rate.get("avg_score", 0)
-            attempts = rate.get("attempts", 0)
-            lines.append(f"- {task_name}: {pass_rate:.1f}% ({attempts} attempts)")
-        
+            return f"No data available for {lab_name}."
+        lines = [f"Pass rates for {lab_name}:"]
+        for pr in pass_rates:
+            task_name = pr.task or pr.title or "Unknown"
+            rate = pr.pass_rate if pr.pass_rate is not None else 0
+            attempts = pr.attempts or 0
+            lines.append(f"- {task_name}: {rate:.1f}% ({attempts} attempts)")
         return "\n".join(lines)
-    except ConnectionError as e:
-        return f"🔴 Backend error: {e}"
-    except httpx.HTTPStatusError as e:
-        return f"🔴 Backend error: {e}"
+    except APIError as e:
+        return f"Failed to fetch scores: {e.message}"

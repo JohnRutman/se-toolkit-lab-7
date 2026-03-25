@@ -46,49 +46,49 @@ def get_handler(command: str) -> Callable[[str, str], str]:
     return handlers.get(command)
 
 
-def run_test_mode(command_text: str) -> None:
+async def run_test_mode(command_text: str) -> None:
     """Run in test mode — call handler directly and print result."""
     command, args = parse_command(command_text)
     handler = get_handler(command)
-    
+
     if handler is None:
         print(f"Unknown command: {command}")
         print("Available commands: /start, /help, /health, /labs, /scores")
         sys.exit(0)
-    
-    response = handler(command, args)
+
+    response = await handler(command, args)
     print(response)
     sys.exit(0)
 
 
 async def handle_telegram_start(message: types.Message, bot: Bot) -> None:
     """Telegram handler for /start."""
-    response = handle_start("/start", "")
+    response = await handle_start("/start", "")
     await message.answer(response)
 
 
 async def handle_telegram_help(message: types.Message, bot: Bot) -> None:
     """Telegram handler for /help."""
-    response = handle_help("/help", "")
+    response = await handle_help("/help", "")
     await message.answer(response)
 
 
 async def handle_telegram_health(message: types.Message, bot: Bot) -> None:
     """Telegram handler for /health."""
-    response = handle_health("/health", "")
+    response = await handle_health("/health", "")
     await message.answer(response)
 
 
 async def handle_telegram_labs(message: types.Message, bot: Bot) -> None:
     """Telegram handler for /labs."""
-    response = handle_labs("/labs", "")
+    response = await handle_labs("/labs", "")
     await message.answer(response)
 
 
 async def handle_telegram_scores(message: types.Message, bot: Bot) -> None:
     """Telegram handler for /scores."""
     args = message.text.split(maxsplit=1)[1] if len(message.text.split()) > 1 else ""
-    response = handle_scores("/scores", args)
+    response = await handle_scores("/scores", args)
     await message.answer(response)
 
 
@@ -130,11 +130,12 @@ def main() -> None:
         metavar="COMMAND",
         help="Test mode: run a command and print result (e.g., --test '/start')",
     )
-    
+
     args = parser.parse_args()
-    
+
     if args.test:
-        run_test_mode(args.test)
+        import asyncio
+        asyncio.run(run_test_mode(args.test))
     else:
         import asyncio
         asyncio.run(run_telegram_bot())
