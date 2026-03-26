@@ -91,3 +91,48 @@ By the end of this lab, you should be able to say:
 2. [Backend Integration](./lab/tasks/required/task-2.md) — P0: slash commands + real data
 3. [Intent-Based Natural Language Routing](./lab/tasks/required/task-3.md) — P1: LLM tool use
 4. [Containerize and Document](./lab/tasks/required/task-4.md) — P3: containerize + deploy
+
+## Deploy
+
+### Prerequisites
+
+Ensure the following environment variables are set in `.env.docker.secret`:
+
+- `BOT_TOKEN` — Telegram bot token
+- `LMS_API_KEY` — Backend API key
+- `LLM_API_KEY`, `LLM_API_BASE_URL`, `LLM_API_MODEL` — LLM credentials
+
+### Deploy commands
+
+```bash
+cd ~/se-toolkit-lab-7
+
+# Stop the nohup bot (if running)
+pkill -f "bot.py" 2>/dev/null
+
+# Build and start all services
+docker compose --env-file .env.docker.secret up --build -d
+
+# Check status
+docker compose --env-file .env.docker.secret ps
+```
+
+### Verify deployment
+
+```bash
+# Check bot container is running
+docker compose --env-file .env.docker.secret ps bot
+
+# View bot logs
+docker compose --env-file .env.docker.secret logs bot --tail 20
+
+# Verify backend is healthy
+curl -sf http://localhost:42002/docs
+```
+
+### Troubleshooting
+
+- **Bot container restarting**: Check logs for missing env vars or import errors
+- **`/health` fails**: Ensure `LMS_API_BASE_URL=http://backend:8000` (not `localhost`)
+- **LLM queries fail**: `LLM_API_BASE_URL` must use `host.docker.internal` (not `localhost`)
+- **"BOT_TOKEN is required"**: Add bot env vars to `.env.docker.secret`
