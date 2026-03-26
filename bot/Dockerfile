@@ -8,7 +8,7 @@ COPY bot/pyproject.toml ./pyproject.toml
 COPY uv.lock ./
 
 # Install dependencies directly (no venv symlink issues)
-RUN uv pip install --system -r pyproject.toml --locked
+RUN uv pip install --system -r pyproject.toml
 
 # Copy bot code
 COPY bot/bot.py ./
